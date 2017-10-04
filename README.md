@@ -1,14 +1,14 @@
-AWS Task Definition Terraform module
+AWS ECS Service Terraform module
 ========================
 
-Terraform module which creates a simple task-definition to be used with ECS services
+Terraform module which create an ECS service into an ECS cluster passed as an argument
 
 Usage
 -----
 
 ```hcl
-module "task" {
-  source                = "git::https://github.com/egarbi/terraform-aws-task-definition"
+module "ecs-service" {
+  source                = "git::https://github.com/egarbi/terraform-aws-ecs-service"
   name            = "example"
   environment     = "testing"
   desired_count   = "1"
