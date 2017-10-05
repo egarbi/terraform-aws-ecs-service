@@ -44,6 +44,11 @@ variable "iam_role" {
   description = "IAM Role ARN to use"
 }
 
+variable "policy" {
+  description = "IAM customs policy to be attached to the task role"
+  default = ""
+}
+
 variable "container_definitions" {
   description = "here you should include the full container definitons"
 }
@@ -76,6 +81,12 @@ resource "aws_iam_role" "main" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy" "main" {
+  name = "${var.name}-${var.environment}"
+  role = "${aws_iam_role.main.id}"
+  policy = "${var.policy}"
 }
 
 resource "aws_ecs_service" "main" {
