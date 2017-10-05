@@ -45,8 +45,19 @@ variable "iam_role" {
 }
 
 variable "policy" {
-  description = "IAM customs policy to be attached to the task role"
-  default = ""
+  description = "IAM custom policy to be attached to the task role"
+  default = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 }
 
 variable "container_definitions" {
