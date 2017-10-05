@@ -46,18 +46,7 @@ variable "iam_role" {
 
 variable "policy" {
   description = "IAM custom policy to be attached to the task role"
-  default = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
+  default = ""
 }
 
 variable "container_definitions" {
@@ -95,6 +84,8 @@ EOF
 }
 
 resource "aws_iam_role_policy" "main" {
+  count = "${var.policy == "" ? 0 : 1}"
+
   name = "${var.name}-${var.environment}"
   role = "${aws_iam_role.main.id}"
   policy = "${var.policy}"
