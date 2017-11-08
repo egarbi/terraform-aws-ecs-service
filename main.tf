@@ -121,7 +121,7 @@ resource "aws_ecs_service" "main" {
 }
 
 module "task" {
-  source                = "git::https://github.com/egarbi/terraform-aws-task-definition"
+  source                = "git::https://github.com/egarbi/terraform-aws-task-definition?ref=1.0.0"
   name                  = "${var.name}-${var.environment}"
   task_role             = "${aws_iam_role.main.arn}"
   container_definitions = "${var.container_definitions}"
