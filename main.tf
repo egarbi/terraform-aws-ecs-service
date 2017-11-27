@@ -1,20 +1,5 @@
 /**
- * The service module creates an ecs service, task definition
- * This module is intended to use with a target_group created
- * externally and passed as an argument.
- *
- * Usage:
- *
- *      module "auth_service" {
- *        source       = "git::ssh://git@bitbucket.org/ldfrtm/stack//service"
- *        name      = "auth-service"
- *        cluster   = "default"
- *      }
- *
- */
-
-/**
- * Required Variables.
+ * Variables.
  */
 
 variable "name" {
