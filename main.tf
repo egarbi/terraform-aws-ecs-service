@@ -1,20 +1,5 @@
 /**
- * The service module creates an ecs service, task definition
- * This module is intended to use with a target_group created
- * externally and passed as an argument.
- *
- * Usage:
- *
- *      module "auth_service" {
- *        source       = "git::ssh://git@bitbucket.org/ldfrtm/stack//service"
- *        name      = "auth-service"
- *        cluster   = "default"
- *      }
- *
- */
-
-/**
- * Required Variables.
+ * Variables.
  */
 
 variable "name" {
@@ -30,9 +15,24 @@ variable "cluster" {
   description = "The cluster name or ARN"
 }
 
+variable "vpc_id" {
+  description = "The VPC ID were the ECS is running"
+}
+
 variable "container_port" {
   description = "The container port"
   default     = 8080
+}
+
+variable "healthcheck" {
+  default = {
+    healthy_threshold   = 2
+    unhealthy_threshold = 5
+    timeout             = 5
+    path                = "/health"
+    interval            = 30
+    matcher             = 200
+  }
 }
 
 variable "desired_count" {
@@ -53,8 +53,12 @@ variable "container_definitions" {
   description = "here you should include the full container definitons"
 }
 
-variable "target_group" {
-  description = "Target Groups will be created with the ALB"
+variable "alb_listener" {
+  description = "Listener were the rule will be added"
+}
+
+variable "rule_priority" {
+  description = "This is the priority number of the listener's rule"
 }
 
 
@@ -91,6 +95,29 @@ resource "aws_iam_role_policy" "main" {
   policy = "${var.policy}"
 }
 
+resource "aws_alb_target_group" "main" {
+  name         = "${var.name}-${var.environment}"
+  port         = "${var.container_port}"
+  protocol     = "HTTP"
+  vpc_id       = "${var.vpc_id}"
+  health_check = [ "${var.healthcheck}" ]
+}
+
+resource "aws_alb_listener_rule" "main" {
+  listener_arn = "${var.alb_listener}"
+  priority     = "${var.rule_priority}"
+
+  action {
+    type             = "forward"
+    target_group_arn = "${aws_alb_target_group.main.arn}"
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["${var.name}.*"]
+  }
+}
+
 resource "aws_ecs_service" "main" {
   name            = "${var.name}"
   cluster         = "${var.cluster}"
@@ -114,7 +141,7 @@ resource "aws_ecs_service" "main" {
   }
 
   load_balancer {
-    target_group_arn = "${var.target_group}"
+    target_group_arn = "${aws_alb_target_group.main.arn}"
     container_name   = "${var.name}_app"
     container_port   = "${var.container_port}"
   }
