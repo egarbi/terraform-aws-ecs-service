@@ -1,18 +1,13 @@
 /**
- * Variables.
+ * Required Variables.
  */
 
 variable "name" {
-  description = "The service name, if empty the service name is defaulted to the image name"
-  default     = ""
-}
-
-variable "environment" {
-  description = "Environment tag, e.g prod"
+  description = "The service name"
 }
 
 variable "cluster" {
-  description = "The cluster name or ARN"
+  description = "The cluster name"
 }
 
 variable "vpc_id" {
@@ -21,6 +16,39 @@ variable "vpc_id" {
 
 variable "zone_id" {
   description = "Zone ID where the ECS service (record) will be added"
+}
+
+variable "container_definitions" {
+  description = "here you should include the full container definitions"
+}
+
+variable "iam_role" {
+  description = "IAM Role ARN to use"
+}
+
+variable "alb_listener" {
+  description = "Listener where the rule will be added"
+}
+
+variable "alb_dns_name" {
+  description = "DNS name of the ALB where the rule will be added"
+}
+
+variable "alb_zone_id" {
+  description = "Zone ID where the ALB is hosted"
+}
+
+variable "rule_priority" {
+  description = "This is the priority number of the listener's rule"
+}
+
+/**
+ * Optional Variables.
+ */
+
+variable "environment" {
+  description = "Environment tag, e.g prod"
+  default     = "default"
 }
 
 variable "container_port" {
@@ -41,38 +69,13 @@ variable "healthcheck" {
 
 variable "desired_count" {
   description = "The desired count"
-  default     = 2
-}
-
-variable "iam_role" {
-  description = "IAM Role ARN to use"
+  default     = 1
 }
 
 variable "policy" {
   description = "IAM custom policy to be attached to the task role"
-  default = ""
+  default     = ""
 }
-
-variable "container_definitions" {
-  description = "here you should include the full container definitons"
-}
-
-variable "alb_listener" {
-  description = "Listener where the rule will be added"
-}
-
-variable "alb_dns_name" {
-  description = "DNS name of the ALB where the rule will be added"
-}
-
-variable "alb_zone_id" {
-  description = "Zone ID where the ALB is hosted"
-}
-
-variable "rule_priority" {
-  description = "This is the priority number of the listener's rule"
-}
-
 
 /* * Resources.
  */
@@ -102,8 +105,8 @@ EOF
 resource "aws_iam_role_policy" "main" {
   count = "${var.policy == "" ? 0 : 1}"
 
-  name = "${var.name}-${var.environment}"
-  role = "${aws_iam_role.main.id}"
+  name   = "${var.name}-${var.environment}"
+  role   = "${aws_iam_role.main.id}"
   policy = "${var.policy}"
 }
 
@@ -112,7 +115,7 @@ resource "aws_alb_target_group" "main" {
   port         = "${var.container_port}"
   protocol     = "HTTP"
   vpc_id       = "${var.vpc_id}"
-  health_check = [ "${var.healthcheck}" ]
+  health_check = ["${var.healthcheck}"]
 }
 
 resource "aws_alb_listener_rule" "main" {
@@ -136,19 +139,19 @@ resource "aws_ecs_service" "main" {
   task_definition = "${module.task.arn}"
   desired_count   = "${var.desired_count}"
   iam_role        = "${var.iam_role}"
-  
+
   placement_strategy {
-    type = "spread"
+    type  = "spread"
     field = "attribute:ecs.availability-zone"
   }
 
   placement_strategy {
-    type = "binpack"
+    type  = "binpack"
     field = "cpu"
   }
 
   placement_strategy {
-    type = "binpack"
+    type  = "binpack"
     field = "memory"
   }
 
@@ -166,7 +169,7 @@ module "task" {
   container_definitions = "${var.container_definitions}"
 }
 
-# Add ALB record on DNS
+// Add ALB record on DNS
 resource "aws_route53_record" "main" {
   zone_id = "${var.zone_id}"
   name    = "${var.name}"
