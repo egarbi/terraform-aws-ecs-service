@@ -8,13 +8,19 @@ Usage
 
 ```hcl
 module "ecs-service" {
-  source                = "git::https://github.com/egarbi/terraform-aws-ecs-service"
-  name            = "example"
-  environment     = "testing"
-  desired_count   = "1"
-  cluster         = "example-cluster"
-  iam_role        = "arn:aws:iam::123203969087:role/ec2_role"
-  target_group    = "arn:aws:elasticloadbalancing:eu-west-1:12345678910:targetgroup/example-testing/xxxxxxxxxxxx"
+  source = "git::https://github.com/egarbi/terraform-aws-ecs-service"
+
+  name                  = "example"
+  environment           = "testing"
+  desired_count         = "1"
+  cluster               = "example-cluster"
+  vpc_id                = "vpc-XXXXXXX"
+  zone_id               = "Z4KAPRWWNC7JR"
+  iam_role              = "arn:aws:iam::12345678910:role/ec2_role"
+  rule_priority         = "10"
+  alb_listener          = "arn:aws:elasticloadbalancing:eu-west-1:12345678910:listener/app/example/1e590za2072344a6nc01fh545fb2301d1"
+  alb_zone_id           = "Z4KAPRXXXC7JR"
+  alb_dns_name          = "example"
   container_definitions = "${file("container_definitions.json")}"
 }
 ```
