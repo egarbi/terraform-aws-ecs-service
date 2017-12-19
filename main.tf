@@ -19,6 +19,10 @@ variable "vpc_id" {
   description = "The VPC ID were the ECS is running"
 }
 
+variable "zone_id" {
+  description = "Zone ID where the ECS service (record) will be added"
+}
+
 variable "container_port" {
   description = "The container port"
   default     = 8080
@@ -54,7 +58,15 @@ variable "container_definitions" {
 }
 
 variable "alb_listener" {
-  description = "Listener were the rule will be added"
+  description = "Listener where the rule will be added"
+}
+
+variable "alb_dns_name" {
+  description = "DNS name of the ALB where the rule will be added"
+}
+
+variable "alb_zone_id" {
+  description = "Zone ID where the ALB is hosted"
 }
 
 variable "rule_priority" {
@@ -152,6 +164,19 @@ module "task" {
   name                  = "${var.name}-${var.environment}"
   task_role             = "${aws_iam_role.main.arn}"
   container_definitions = "${var.container_definitions}"
+}
+
+# Add ALB record on DNS
+resource "aws_route53_record" "main" {
+  zone_id = "${var.zone_id}"
+  name    = "${var.name}"
+  type    = "A"
+
+  alias {
+    name                   = "${var.alb_dns_name}"
+    zone_id                = "${var.alb_zone_id}"
+    evaluate_target_health = false
+  }
 }
 
 // The task role name used by the task definition
