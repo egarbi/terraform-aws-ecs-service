@@ -182,18 +182,18 @@ resource "aws_route53_record" "main" {
   }
 }
 
-// The task role name used by the task definition
 output "task_role" {
-  value = "${aws_iam_role.main.name}"
+  description = "The task role name used by the task definition"
+  value       = "${aws_iam_role.main.name}"
 }
 
-// The task role arn used by the task definition
 output "task_role_arn" {
-  value = "${aws_iam_role.main.arn}"
+  description = "The task role arn used by the task definition"
+  value       = "${aws_iam_role.main.arn}"
 }
 
-// The target group name created by this module
 // It has proven be useful to be used as input for other modules
 output "target_group" {
-  value = "${aws_alb_target_group.main.name}"
+  description = "The target group name created by this module"
+  value       = "${aws_alb_target_group.main.name}"
 }
