@@ -191,3 +191,9 @@ output "task_role" {
 output "task_role_arn" {
   value = "${aws_iam_role.main.arn}"
 }
+
+// The target group name created by this module
+// It has proven be useful to be used as input for other modules
+output "target_group" {
+  value = "${aws_alb_target_group.main.name}"
+}
