@@ -197,3 +197,8 @@ output "target_group" {
   description = "The target group name created by this module"
   value       = "${aws_alb_target_group.main.name}"
 }
+
+output "target_group_arn_suffix" {
+  description = "The target group suffix to use as input on alarms"
+  value       = "${aws_alb_target_group.main.arn_suffix}"
+}
