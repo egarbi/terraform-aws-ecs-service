@@ -77,6 +77,16 @@ variable "policy" {
   default     = ""
 }
 
+variable "cookie_duration" {
+  description = "The time period, in seconds, during which requests from a client should be routed to the same target.The range is 1 second to 1 week (604800 seconds)"
+  default     = "86400"
+}
+
+variable "stick_enabled" {
+  description = "Boolen to enable / disable stickiness"
+  default     = "false"
+}
+
 /* * Resources.
  */
 
@@ -116,6 +126,11 @@ resource "aws_alb_target_group" "main" {
   protocol     = "HTTP"
   vpc_id       = "${var.vpc_id}"
   health_check = ["${var.healthcheck}"]
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = "${var.cookie_duration}"
+    enabled         = "${var.stick_enabled}"
+  }
 }
 
 resource "aws_alb_listener_rule" "main" {
